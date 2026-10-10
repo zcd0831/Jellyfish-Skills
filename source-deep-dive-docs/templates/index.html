@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<!-- ★ 首页骨架：它是全书的锚点，不是「文档列表」。
+     必须包含：一句话定位 → 关键事实表 → 全局结构图 → 页面地图卡片 → 推荐阅读顺序 → 文档自身说明。
+     页面地图的卡片是 check-docs.py 之外唯一需要手工维护的派生位置，改页号时别忘了这里。 -->
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>文档名 · 总览与导航</title>
+<!-- ★ 描述里写清：项目是什么、共几页、覆盖哪些主题。搜索与分享时用得上。 -->
+<meta name="description" content="XXX（一句话技术定位）的源码级学习文档：N 个页面，按「入门 → 核心机制 → 外壳 → 扩展 → 工程参考」五部分编排，覆盖……。">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+
+<header class="topbar">
+  <button class="nav-toggle" id="navToggle" aria-label="切换导航" aria-expanded="false">☰</button>
+  <a class="brand" href="index.html">📘 文档名</a>
+  <div class="topbar-tools">
+    <input id="navSearch" type="search" placeholder="搜索页面…" aria-label="搜索页面">
+  </div>
+</header>
+
+<div class="layout">
+
+  <nav class="sidebar" id="sidebar" aria-label="文档导航">
+    <div class="sidebar-title">文档目录</div>
+    <ul class="nav-list">
+      <!-- ★ 首页也要有 aria-current="page" -->
+      <li><a href="index.html" aria-current="page">首页 · 总览与导航</a></li>
+    </ul>
+    <div class="nav-group">一、入门</div>
+    <ul class="nav-list">
+      <li><a href="01-overview.html">01 项目概览</a></li>
+      <li><a href="02-quickstart.html">02 快速上手</a></li>
+    </ul>
+    <!-- ★ 其余分组照此补全，与所有内容页的侧栏逐字一致 -->
+  </nav>
+
+  <main class="content">
+
+    <nav class="breadcrumb" aria-label="面包屑">
+      <span>文档名</span><span class="sep">/</span><span>首页</span>
+    </nav>
+
+    <h1>文档名</h1>
+    <p class="page-sub">
+      这套文档回答三个问题：<strong>它是怎么设计的、怎么实现的、为什么这么实现</strong>。
+      每个结论都附 <code>文件:行号</code>，可以自己跳过去看。
+    </p>
+
+    <section class="goals">
+      <h2>这套文档回答什么</h2>
+      <ul>
+        <li><strong>怎么设计的</strong>——模块的职责边界、接口划分、数据结构选型；</li>
+        <li><strong>怎么实现的</strong>——核心算法与控制流，附可直接跳转的源码位置与代码片段；</li>
+        <li><strong>为什么这么实现</strong>——工程约束、被放弃的替代方案、代价是什么；</li>
+        <li><strong>有哪些坑</strong>——有源码依据的陷阱，按主题分组；</li>
+        <li><strong>从哪里开始读</strong>——按目的给出的三条阅读路线。</li>
+      </ul>
+    </section>
+
+    <h2>一句话认识它</h2>
+
+    <!-- ★ 用 2~4 句话说清它是什么、由哪几块组成、最核心的设计取舍是什么。不要抄 README。 -->
+    <p>
+      一句话定位：它是<strong>什么类型的东西</strong>，核心由<strong>哪几块</strong>组成，
+      最关键的取舍是<strong>什么换什么</strong>。
+    </p>
+
+    <!-- ★ 关键事实表：每个数字都要有出处。放在首页，读者一眼能判断规模与技术栈。 -->
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th>关键事实</th><th>值</th><th>依据</th></tr></thead>
+        <tbody>
+          <tr><td>代码规模</td><td>约 <strong>N 万行</strong> / 约 <strong>M 个类</strong></td><td>逐文件统计 <code>src/main</code></td></tr>
+          <tr><td>模块划分</td><td>K 个模块（…）</td><td><code>pom.xml:43-51</code></td></tr>
+          <tr><td>语言 / 运行时</td><td>…</td><td><code>pom.xml:54-56</code></td></tr>
+          <tr><td>外部依赖</td><td>…</td><td>构建文件</td></tr>
+          <tr><td>扩展点</td><td>N 个（…）</td><td><code>api/extension</code></td></tr>
+          <tr><td>关键默认值</td><td>…</td><td><code>XxxSettings.java:39</code></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h2>全局结构</h2>
+
+    <p>依赖方向是否单向、边界划在哪一步。看懂这张图就理解了它的组织原则。</p>
+
+    <div class="mermaid">
+flowchart TD
+  A["外壳 1"] --> D["装配层"]
+  B["外壳 2"] --> D
+  D --> C["核心逻辑"]
+  C --> I["基础设施"]
+  I --> P["扩展接口（对外稳定契约）"]
+  P -. "运行时接入，无编译期依赖" .-> E["扩展实现"]
+    </div>
+    <p class="figure-cap">图 0-1　模块依赖与扩展边界：这张图回答「能力是怎么加进来的」</p>
+
+    <h2>页面地图</h2>
+
+    <!--
+      ★ 卡片：每张 = 页号 + 标题 + 一句话摘要 + 本页覆盖的源码文件。
+      最后的「覆盖的源码文件」很关键：读者能从「我知道的那个文件」反查到该读哪一页。
+      一句话摘要要写「这页回答什么问题」，不要重复标题。
+    -->
+    <h3>一、入门</h3>
+
+    <div class="cards">
+
+      <div class="card">
+        <div class="card-no">01</div>
+        <h3><a href="01-overview.html">项目概览</a></h3>
+        <p>这页回答：它解决什么问题、核心设计取舍是什么、代价是什么。</p>
+        <div class="card-file">pom.xml · README.md · docs/CONSTRAINTS.md</div>
+      </div>
+
+      <div class="card">
+        <div class="card-no">02</div>
+        <h3><a href="02-quickstart.html">快速上手</a></h3>
+        <p>这页回答：怎么把它跑起来、配置从哪读、各层的优先级如何。</p>
+        <div class="card-file">cli/…/Main.java · config.json · SettingsBinder.java</div>
+      </div>
+
+    </div>
+
+    <!-- ★ 每个分组一个 h3 + 一组 cards -->
+
+    <h2>推荐阅读顺序</h2>
+
+    <!-- ★ 按「目的」给路线，而不是只有一种顺序。读者目的不同，该读的页不同。 -->
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th>你的目的</th><th>路线</th></tr></thead>
+        <tbody>
+          <tr><td>只想用它</td><td><a href="02-quickstart.html">02</a> → <a href="01-overview.html">01</a> → 各扩展页</td></tr>
+          <tr><td>想改核心逻辑</td><td><a href="01-overview.html">01</a> → 全局结构 → 主干道各页 → 坑点</td></tr>
+          <tr><td>想写一个扩展</td><td><a href="01-overview.html">01</a> → 扩展接口页 → 各实现的拆解页</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h2>关于这套文档本身</h2>
+
+    <div class="callout tip">
+      <span class="callout-title">离线阅读与自检</span>
+      <p>
+        本套文档<strong>完全离线可用</strong>：直接双击任意 <code>.html</code> 即可，
+        不需要服务器、不需要构建。
+      </p>
+      <p>
+        代码高亮与图表用的是第三方库（<code>assets/vendor/</code>）。
+        目录为空时文档<strong>依然可读</strong>：代码不着色、图表以源码形式展示，
+        页面会给出提示；<code>assets/app.js</code> 也会自动回退到 CDN。
+        想彻底离线，执行一次 <code>sh assets/vendor/fetch-vendor.sh</code>。
+      </p>
+      <p>
+        文中所有 <code>文件:行号</code> 都可以用 <code>sh assets/verify-refs.sh</code> 核验落地，
+        页面结构、编号、链接的一致性用 <code>python3 assets/check-docs.py</code> 核验。
+        源码改动之后请跑一次——行号会漂移。
+      </p>
+    </div>
+
+    <div class="conclusion">
+      <h2>关键结论</h2>
+      <ol>
+        <li>用一句话概括它的架构（写在这里，让只读首页的人也能拿到）。</li>
+        <li>它的默认方向是什么（保守还是激进），代价是什么。</li>
+        <li>读它的正确方式不是逐文件读完，而是顺着一条主干道走完全程。</li>
+      </ol>
+    </div>
+
+    <nav class="pager" aria-label="翻页">
+      <a class="prev disabled" href="index.html"><span class="pager-dir">上一页</span>已是首页</a>
+      <a class="next" href="01-overview.html"><span class="pager-dir">下一页</span>01 项目概览</a>
+    </nav>
+
+  </main>
+</div>
+
+<footer class="footer">
+  文档名 · 文中所有 <code>文件:行号</code> 均指仓库中的真实位置；
+  示例中出现的密钥、token 与内网地址一律脱敏。
+  本套文档可离线阅读，自检命令见上方「关于这套文档本身」。
+</footer>
+
+<script src="assets/vendor/highlight.min.js"></script>
+<script src="assets/vendor/mermaid.min.js"></script>
+<script src="assets/app.js"></script>
+</body>
+</html>
