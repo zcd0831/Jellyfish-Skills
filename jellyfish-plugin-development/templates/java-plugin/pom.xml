@@ -34,7 +34,7 @@
         <maven.compiler.target>1.8</maven.compiler.target>
 
         <!-- 与运行中的内核保持一致；内核升级后改这里并重新 clean package -->
-        <jellyfish.version>0.1.1</jellyfish.version>
+        <jellyfish.version>0.1.2</jellyfish.version>
         <slf4j.version>1.7.36</slf4j.version>
         <junit.version>5.10.2</junit.version>
         <mockito.version>4.11.0</mockito.version>
