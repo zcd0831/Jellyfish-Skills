@@ -1,0 +1,38 @@
+{
+  "entry": "main.py",
+  "tools": [
+    {
+      "name": "my_hello",
+      "description": "按名字打招呼（示例工具）",
+      "parameters": {
+        "name": {
+          "type": "string",
+          "description": "要打招呼的人"
+        }
+      },
+      "required": [
+        "name"
+      ]
+    }
+  ],
+  "commands": [
+    {
+      "name": "myhello",
+      "hasOptions": false,
+      "descriptor": {
+        "summary": "和示例脚本打个招呼",
+        "usage": "/myhello <名字>",
+        "aliases": [
+          "mh"
+        ],
+        "sessionRequired": false
+      }
+    }
+  ],
+  "contributions": [
+    "prompt"
+  ],
+  "events": [
+    "ToolCallCompletedEvent"
+  ]
+}

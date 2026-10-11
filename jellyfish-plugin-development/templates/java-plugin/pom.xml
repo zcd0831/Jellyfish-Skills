@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Jellyfish 插件工程模板（独立 Maven 工程版）。
+
+  用法：把 templates/java-plugin/ 整目录拷成自己的插件目录，然后：
+    1) 把 groupId / artifactId / version 改成自己的（artifactId 建议与 plugin.id 同名或加前缀）；
+    2) 把包名 com.example.myplugin 全局替换掉；
+    3) plugin.properties 里的 plugin.id / plugin.class / plugin.description 一起改。
+
+  三条硬约束（改这个文件时不要破坏）：
+    * jellyfish-api 永远 provided —— 插件 jar 里不能含 api 的类，内核加载期会直接拒绝这种 jar；
+    * slf4j-api 也 provided —— 宿主已提供，自带一份会打出两份日志配置；
+    * 私有依赖（Jackson、commons-exec…）用 compile + 下面的 shade 打进去，且 includes 里
+      绝不能出现 jellyfish-api / org.pf4j:pf4j / slf4j。
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+         http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.example</groupId>
+    <artifactId>my-plugin</artifactId>
+    <version>0.1.0</version>
+    <packaging>jar</packaging>
+
+    <name>My Plugin</name>
+    <description>一句话说明这个插件做什么。</description>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <!-- 内核跑在 JDK 1.8 上：不要使用 Java 9+ 的 API 或语法 -->
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
+
+        <!-- 与运行中的内核保持一致；内核升级后改这里并重新 clean package -->
+        <jellyfish.version>0.1.1</jellyfish.version>
+        <slf4j.version>1.7.36</slf4j.version>
+        <junit.version>5.10.2</junit.version>
+        <mockito.version>4.11.0</mockito.version>
+        <maven-compiler-plugin.version>3.11.0</maven-compiler-plugin.version>
+        <maven-shade-plugin.version>3.5.1</maven-shade-plugin.version>
+    </properties>
+
+    <dependencies>
+        <!-- 内核契约。provided：不进插件包，插件拿到的永远是运行期内核那一份值类型 -->
+        <dependency>
+            <groupId>io.github.zcd0831</groupId>
+            <artifactId>jellyfish-api</artifactId>
+            <version>${jellyfish.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- 日志：宿主已有 slf4j，同样 provided -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>${slf4j.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- 单测：JUnit5 + Mockito -->
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <version>${mockito.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-junit-jupiter</artifactId>
+            <version>${mockito.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- 仅测试期：加载链路用例需要真实的注册表、事件通道与 PF4J 插件管理器。
+             注册与派发走的就是内核那条路径；换成假货只是验证「我以为内核会怎么查」。
+             绝不可把它升为 compile —— 那会让插件依赖内核实现，而不是只依赖契约。 -->
+        <dependency>
+            <groupId>io.github.zcd0831</groupId>
+            <artifactId>jellyfish-infra</artifactId>
+            <version>${jellyfish.version}</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>${maven-compiler-plugin.version}</version>
+                <configuration>
+                    <!-- 保留构造器参数名：api 的载荷类型是「全字段构造器 + 无 setter」的不可变值类型，
+                         用 Jackson 反序列化时只能靠参数名把字段对上。去掉它，表现是「写得出、读不回」，
+                         而编译与大部分单测依然全绿。 -->
+                    <parameters>true</parameters>
+                </configuration>
+            </plugin>
+
+            <!--
+              只有自带第三方依赖（Jackson、commons-exec 之类）时才需要 shade。
+              需要时把下面这段解开，并把 <include> 换成自己的依赖坐标——
+              常见坑是顺手加了 jellyfish-api（或 pf4j / slf4j），那会让插件带着旧的值类型跑。
+            -->
+            <!--
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>${maven-shade-plugin.version}</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                        <configuration>
+                            <createDependencyReducedPom>true</createDependencyReducedPom>
+                            <artifactSet>
+                                <includes>
+                                    <include>com.fasterxml.jackson.core:*</include>
+                                </includes>
+                            </artifactSet>
+                            <filters>
+                                <filter>
+                                    <artifact>*:*</artifact>
+                                    <excludes>
+                                        <exclude>META-INF/*.SF</exclude>
+                                        <exclude>META-INF/*.DSA</exclude>
+                                        <exclude>META-INF/*.RSA</exclude>
+                                        <exclude>module-info.class</exclude>
+                                    </excludes>
+                                </filter>
+                            </filters>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            -->
+        </plugins>
+    </build>
+</project>
