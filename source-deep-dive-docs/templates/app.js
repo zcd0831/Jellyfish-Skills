@@ -516,8 +516,9 @@
     var bar = document.createElement('div');
     bar.className = 'offline-note';
     bar.innerHTML = '⚠️ <strong>' + head + '</strong>：' + body
-      + ' 想彻底离线渲染，执行 <code>sh assets/vendor/fetch-vendor.sh</code>，'
-      + '或按 <code>assets/vendor/README.md</code> 手动放好文件后刷新。';
+      + ' 想彻底离线渲染，把 mermaid 10.9.1 的 <code>mermaid.min.js</code> 放进 '
+      + '<code>assets/vendor/</code>（想要语法高亮再放一份 highlight.js 11.9.0 的 '
+      + '<code>highlight.min.js</code>），刷新即可——版本需与 <code>assets/app.js</code> 里 CDN 兜底的一致。';
 
     var content = document.querySelector('.content');
     if (content && content.firstChild) {

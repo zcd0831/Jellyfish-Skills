@@ -144,21 +144,21 @@ flowchart TD
     <h2>关于这套文档本身</h2>
 
     <div class="callout tip">
-      <span class="callout-title">离线阅读与自检</span>
+      <span class="callout-title">离线阅读与维护</span>
       <p>
         本套文档<strong>完全离线可用</strong>：直接双击任意 <code>.html</code> 即可，
         不需要服务器、不需要构建。
       </p>
       <p>
-        代码高亮与图表用的是第三方库（<code>assets/vendor/</code>）。
-        目录为空时文档<strong>依然可读</strong>：代码不着色、图表以源码形式展示，
-        页面会给出提示；<code>assets/app.js</code> 也会自动回退到 CDN。
-        想彻底离线，执行一次 <code>sh assets/vendor/fetch-vendor.sh</code>。
+        代码高亮与图表用的是第三方库（<code>assets/vendor/</code>）——约 3.4 MB 的构建产物，
+        因此<strong>不入版本库</strong>：本地有文件就用本地，缺文件时 <code>assets/app.js</code>
+        自动回退 CDN；两者都取不到时文档<strong>依然可读</strong>，只是代码不着色、
+        图表以源码形式展示，并在页面顶部给出提示。想彻底离线就把版本对齐的两个库文件放进该目录。
       </p>
       <p>
-        文中所有 <code>文件:行号</code> 都可以用 <code>sh assets/verify-refs.sh</code> 核验落地，
-        页面结构、编号、链接的一致性用 <code>python3 assets/check-docs.py</code> 核验。
-        源码改动之后请跑一次——行号会漂移。
+        <strong>维护提示：</strong>行号会随源码漂移，改完文档请用产出这套文档的技能
+        （<code>source-deep-dive-docs</code>）里的核验脚本跑一遍：<code>verify-refs.sh</code>
+        查每条 <code>文件:行号</code> 是否落地，<code>check-docs.py</code> 查编号、侧栏、翻页、链接是否一致。
       </p>
     </div>
 

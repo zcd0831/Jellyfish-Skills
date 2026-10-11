@@ -553,7 +553,9 @@ def main():
         print('（dry-run，未写入任何文件。确认统计与样本无误后加 --apply）')
     else:
         print('')
-        print('已写入。请接着跑：python3 scripts/check-docs.py %s' % doc_dir)
+        # 提示里给的是脚本自己的兄弟路径：核验脚本与这个脚本同目录（技能目录），不在文档目录里
+        sibling = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'check-docs.py')
+        print('已写入。请接着跑：python3 "%s" "%s"' % (sibling, doc_dir))
     return 0 if not problems else 1
 
 

@@ -40,18 +40,22 @@
 
 ### 用法
 
+脚本用**本技能自己的那一份**（`<技能目录>/scripts/verify-refs.sh`），**不要复制进产出目录**：
+复制出去的副本不会跟着技能升级，只会漂移成两份（见 `SKILL.md`「复用优先于重建」）。
+文档目录**显式给**最稳；选项要写在位置参数**前面**（解析到第一个非选项参数就停）。
+
 ```sh
-# 最简单：文档目录 = 当前目录，源码根自动探测
-sh assets/verify-refs.sh
+# 显式给文档目录 + 源码根（推荐：两个都给，别依赖任何自动探测）
+sh <技能目录>/scripts/verify-refs.sh <文档目录> <源码根1> <源码根2>
 
-# 列出「引用注释/注解行」的条目（默认只汇总数量）
-sh assets/verify-refs.sh -v
+# 只给文档目录，源码根自动探测
+sh <技能目录>/scripts/verify-refs.sh <文档目录>
 
-# 显式指定文档目录与一个或多个源码根（多仓库工作区必须这样用）
-sh assets/verify-refs.sh <文档目录> <源码根1> <源码根2>
+# 列出「引用注释/注解行」的条目（默认只汇总数量）——选项在前
+sh <技能目录>/scripts/verify-refs.sh -v <文档目录>
 
 # 只看某几种扩展名的引用
-sh assets/verify-refs.sh -x java,ts,go
+sh <技能目录>/scripts/verify-refs.sh -x java,ts,go <文档目录>
 ```
 
 ### 关于「自动探测源码根」——它会选错，要知道症状
@@ -74,8 +78,8 @@ workspace/
 **怎么办**：显式给出源码根。根可以给多个，按「从具体到宽泛」排列——`verify-refs.sh` 会按顺序用它们解析引用，找不到再退回按路径后缀匹配。
 
 ```sh
-sh assets/verify-refs.sh docs ..            # 源码根 = 上一级
-sh assets/verify-refs.sh docs . ../other    # 多个根，按顺序试
+sh <技能目录>/scripts/verify-refs.sh docs ..            # 源码根 = 上一级
+sh <技能目录>/scripts/verify-refs.sh docs . ../other    # 多个根，按顺序试
 ```
 
 脚本在「缺文件」数量偏多时也会直接把这条提示打出来，不会让你对着上千条报错猜原因。
@@ -114,9 +118,11 @@ sh assets/verify-refs.sh docs . ../other    # 多个根，按顺序试
 
 ### 用法
 
+同样用本技能的那一份，并把文档目录**显式给**——脚本不在产出目录里，别指望它自己猜对：
+
 ```sh
-python3 assets/check-docs.py            # 默认当前目录
-python3 assets/check-docs.py <文档目录>
+python3 <技能目录>/scripts/check-docs.py <文档目录>
+python3 <技能目录>/scripts/check-docs.py            # 不给则用当前目录
 ```
 
 它**不需要配置**——所有期望值都从侧栏推导（见下）。
