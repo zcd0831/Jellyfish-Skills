@@ -1,0 +1,19 @@
+# Python 字节码缓存。
+# 真的会出现：跑官方生成器（dump_manifest.py）校验清单，或就地执行本仓库脚本时，
+# Python 会把 .pyc 写在被 import 的脚本旁边（如 templates/script-python/__pycache__/），
+# 那是执行产物而不是源码，且与解释器版本绑定（cpython-311 / cpython-314 …），不该进版本库。
+__pycache__/
+*.py[cod]
+
+# Maven 构建输出。
+# 真的会出现：templates/java-plugin/ 带着一份可用的 pom.xml，就地验证它能编译（mvn test）
+# 就会生成 target/。模板本身是给人拷走的源码，构建产物不入库。
+target/
+
+# macOS Finder 元数据：会在仓库里到处生成。
+.DS_Store
+**/.DS_Store
+
+# IDE 工程文件。
+.idea/
+*.iml
